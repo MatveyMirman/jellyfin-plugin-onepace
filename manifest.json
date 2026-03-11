@@ -11,7 +11,7 @@
                 "version": "1.0.0.0",
                 "changelog": "Initial fork release",
                 "targetAbi": "10.9.1.0",
-                "sourceUrl": "https://raw.githubusercontent.com/MatveyMirman/jellyfin-repository/master/one-pace/one-pace_1.0.0.0.zip",
+                "sourceUrl": "https://github.com/MatveyMirman/jellyfin-plugin-onepace/archive/refs/tags/v1.0.0.zip",
                 "checksum": "",
                 "timestamp": "2026-03-11T00:00:00Z"
             }
