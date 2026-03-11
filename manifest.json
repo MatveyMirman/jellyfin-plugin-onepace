@@ -1,0 +1,20 @@
+[
+    {
+        "guid": "1c0bf35e-3df4-47cc-8a4e-e3865de60d2f",
+        "name": "One Pace",
+        "description": "Please report bugs at https://github.com/MatveyMirman/jellyfin-plugin-onepace",
+        "overview": "Metadata and cover art integration for the One Pace project",
+        "owner": "MatveyMirman",
+        "category": "Metadata",
+        "versions": [
+            {
+                "version": "1.0.0.0",
+                "changelog": "Initial fork release",
+                "targetAbi": "10.9.1.0",
+                "sourceUrl": "https://raw.githubusercontent.com/MatveyMirman/jellyfin-repository/master/one-pace/one-pace_1.0.0.0.zip",
+                "checksum": "",
+                "timestamp": "2026-03-11T00:00:00Z"
+            }
+        ]
+    }
+]
