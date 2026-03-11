@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
@@ -66,6 +68,33 @@ public class ArcImageProvider : IRemoteImageProvider, IHasOrder
             .ConfigureAwait(false);
         if (arcMatch != null)
         {
+            var seasonPath = item.Path;
+            if (!string.IsNullOrEmpty(seasonPath))
+            {
+                var seasonDirectory = Path.GetDirectoryName(seasonPath);
+                if (!string.IsNullOrEmpty(seasonDirectory))
+                {
+                    var seasonPosterPattern = $"Season{arcMatch.Rank}.png";
+                    var seasonPosterPath = Path.Combine(seasonDirectory, seasonPosterPattern);
+                    if (File.Exists(seasonPosterPath))
+                    {
+                        result.Add(new RemoteImageInfo
+                        {
+                            Type = ImageType.Primary,
+                            Url = $"file://{seasonPosterPath}",
+                            ProviderName = Name
+                        });
+
+                        _log.LogInformation(
+                            "Found local season poster for {Item} --> {Path}",
+                            JsonSerializer.Serialize(item),
+                            seasonPosterPath);
+
+                        return result;
+                    }
+                }
+            }
+
             var coverArts = await _repository
                 .FindAllCoverArtByArcIdAsync(arcMatch.Id, cancellationToken)
                 .ConfigureAwait(false);

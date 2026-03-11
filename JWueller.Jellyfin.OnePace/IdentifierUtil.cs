@@ -14,10 +14,21 @@ internal static class IdentifierUtil
     {
         var pattern = @"\b" + string.Join(@"\s+", needle.Split().Select(Regex.Escape)) + @"\b";
 
-        // This is such a common typo that even the One Pace team made it: The arc is called "Whisky Peak",
-        // but even some of the distributed files are called "Whiskey Peak" instead. We accept both.
         pattern = pattern.Replace("Whisky", "Whiske?y", StringComparison.InvariantCultureIgnoreCase);
 
+        return new Regex(pattern, RegexOptions.IgnoreCase);
+    }
+
+    public static Regex BuildChapterRangeRegex(string chapters)
+    {
+        var normalized = chapters.Trim();
+
+        var escaped = Regex.Escape(normalized);
+        var withOptionalBrackets = escaped.Replace(@"\(", @"\[?", StringComparison.Ordinal).Replace(@"\)", @"\]?", StringComparison.Ordinal);
+        var withOptionalCommas = withOptionalBrackets.Replace(",", @"[\s,]*", StringComparison.Ordinal);
+        var withOptionalCoverStories = withOptionalCommas.Replace("cover stories", @"(\s+cover\s+stories)?", StringComparison.OrdinalIgnoreCase);
+
+        var pattern = $@"\b{withOptionalCoverStories}\b";
         return new Regex(pattern, RegexOptions.IgnoreCase);
     }
 }

@@ -55,6 +55,33 @@ public class ArcIdentifierTests
 
             new TestArc
             {
+                Id = "gaimon_arc",
+                Rank = 4,
+                InvariantTitle = "Gaimon",
+                MangaChapters = "42, 22",
+                ReleaseDate = null
+            },
+
+            new TestArc
+            {
+                Id = "cover_stories_arc",
+                Rank = 11,
+                InvariantTitle = "The Trials of Koby-Meppo",
+                MangaChapters = "83-119",
+                ReleaseDate = null
+            },
+
+            new TestArc
+            {
+                Id = "marineford_arc",
+                Rank = 26,
+                InvariantTitle = "Marineford",
+                MangaChapters = "549-580",
+                ReleaseDate = null
+            },
+
+            new TestArc
+            {
                 Id = "clqgslsp8006pnv5c08glvvjm",
                 Rank = 10,
                 InvariantTitle = "Whisky Peak",
@@ -183,5 +210,26 @@ public class ArcIdentifierTests
         var arc = await ArcIdentifier.IdentifyAsync(_repository, itemLookupInfo, CancellationToken.None);
 
         Assert.Null(arc);
+    }
+
+    /// <summary>
+    /// Test Season folder format with season number prefix.
+    /// </summary>
+    [Theory]
+    [InlineData("/path/to/One Pace (2013) {270968} [1080p mixed]/Season 1 [1-7] Romance Dawn [En Sub][720p]", "Romance Dawn")]
+    [InlineData("/path/to/One Pace (2013) {270968} [1080p mixed]/Season 4 [42, 22] Gaimon [En Sub][720p]", "Gaimon")]
+    [InlineData("/path/to/One Pace (2013) {270968} [1080p mixed]/Season 11 [83-119 cover stories] The Trials of Koby-Meppo [En Sub][720p]", "The Trials of Koby-Meppo")]
+    [InlineData("/path/to/One Pace (2013) {270968} [1080p mixed]/Season 26 [549-580] Marineford [En Sub][720p]", "Marineford")]
+    public async Task ShouldIdentifyArcBySeasonFolder(string path, string expectedInvariantTitle)
+    {
+        var itemLookupInfo = new ItemLookupInfo
+        {
+            Path = path
+        };
+
+        var arc = await ArcIdentifier.IdentifyAsync(_repository, itemLookupInfo, CancellationToken.None);
+
+        Assert.NotNull(arc);
+        Assert.Equal(expectedInvariantTitle, arc.InvariantTitle);
     }
 }

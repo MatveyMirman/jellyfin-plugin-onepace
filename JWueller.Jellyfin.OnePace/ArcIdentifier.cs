@@ -41,9 +41,20 @@ internal static class ArcIdentifier
             foreach (var arc in arcs.OrderByDescending(arc => arc.MangaChapters?.Length ?? 0))
             {
                 if (!string.IsNullOrEmpty(arc.MangaChapters) &&
-                    IdentifierUtil.BuildTextRegex(arc.MangaChapters).IsMatch(directoryName))
+                    IdentifierUtil.BuildChapterRangeRegex(arc.MangaChapters).IsMatch(directoryName))
                 {
                     return arc;
+                }
+            }
+
+            // match against season number (e.g., "Season 26" -> arc rank 26)
+            var seasonMatch = Regex.Match(directoryName, @"Season\s+(\d+)", RegexOptions.IgnoreCase);
+            if (seasonMatch.Success && int.TryParse(seasonMatch.Groups[1].Value, out var seasonNumber))
+            {
+                var arcByRank = arcs.FirstOrDefault(arc => arc.Rank == seasonNumber);
+                if (arcByRank != null)
+                {
+                    return arcByRank;
                 }
             }
 
