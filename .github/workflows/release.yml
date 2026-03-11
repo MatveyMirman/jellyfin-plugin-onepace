@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+      with:
+        fetch-depth: 0
+        fetch-tags: true
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Get version
+      id: version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+    - name: Build plugin
+      run: |
+        cd JWueller.Jellyfin.OnePace
+        dotnet publish -c Release -o ../publish
+
+    - name: Create zip and update manifest
+      run: |
+        VERSION=${{ steps.version.outputs.VERSION }}
+        cd publish
+        zip -r ../one-pace_${VERSION}.zip .
+        
+        FILENAME=one-pace_${VERSION}.zip
+        CHECKSUM=$(sha256sum ../$FILENAME | cut -d' ' -f1)
+        
+        cd ..
+        cat > manifest.json << EOF
+        [
+          {
+            "guid": "1c0bf35e-3df4-47cc-8a4e-e3865de60d2f",
+            "name": "One Pace",
+            "description": "Please report bugs at https://github.com/MatveyMirman/jellyfin-plugin-onepace",
+            "overview": "Metadata and cover art integration for the One Pace project",
+            "owner": "MatveyMirman",
+            "category": "Metadata",
+            "versions": [
+              {
+                "version": "${VERSION}",
+                "changelog": "Release ${VERSION}",
+                "targetAbi": "10.9.1.0",
+                "sourceUrl": "https://github.com/MatveyMirman/jellyfin-plugin-onepace/releases/download/v${VERSION}/${FILENAME}",
+                "checksum": "${CHECKSUM}",
+                "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              }
+            ]
+          }
+        ]
+        EOF
+
+    - name: Upload Release Asset
+      uses: softprops/action-gh-release@v2
+      with:
+        files: one-pace_${{ steps.version.outputs.VERSION }}.zip
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Commit manifest to master
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git checkout -B master origin/master
+        git add manifest.json
+        git commit -m "Update manifest for v${{ steps.version.outputs.VERSION }}" --allow-empty
+        git push origin master --force
+
