@@ -31,7 +31,7 @@ jobs:
     - name: Build plugin
       run: |
         cd JWueller.Jellyfin.OnePace
-        dotnet publish -c Release -o ../publish
+        dotnet publish -c Release -o ../publish -p:PluginVersion=${{ steps.version.outputs.VERSION }} -p:SolutionDir=../
 
     - name: Create zip and update manifest
       run: |
