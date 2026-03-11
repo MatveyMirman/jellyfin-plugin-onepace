@@ -23,6 +23,11 @@ jobs:
       id: version
       run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
+    - name: Create changelog
+      run: |
+        mkdir -p changelogs
+        echo "Release ${{ steps.version.outputs.VERSION }}" > changelogs/${{ steps.version.outputs.VERSION }}.md
+
     - name: Build plugin
       run: |
         cd JWueller.Jellyfin.OnePace
