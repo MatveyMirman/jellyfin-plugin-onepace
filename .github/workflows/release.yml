@@ -40,7 +40,7 @@ jobs:
         zip -r ../one-pace_${VERSION}.zip .
         
         FILENAME=one-pace_${VERSION}.zip
-        CHECKSUM=$(md5sum ../$FILENAME | cut -d' ' -f1)
+        CHECKSUM=$(sha1sum ../$FILENAME | cut -d' ' -f1)
         
         cd ..
         cat > manifest.json << EOF
